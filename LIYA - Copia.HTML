@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生日快乐，栗子</title>
+    <style>
+        body { margin: 0; overflow: hidden; position: relative; }
+        canvas { display: block; position: absolute; top: 0; left: 0; z-index: 1; }
+        img { display: block; width: 100vw; height: 100vh; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 0; }
+        .navbar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: black;
+            height: 20px;
+            z-index: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .footer-text {
+            color: #FFD700;
+            font-size: 12px;
+            font-family: Arial, sans-serif;
+            text-shadow: 1px 1px 2px #000000;
+        }
+        .music-control {
+            position: fixed;
+            bottom: 30px;
+            right: 10px;
+            z-index: 4;
+            border: 2px solid #FFD700;
+        }
+        .music-control img {
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: none;
+        }
+        .music-control img.active {
+            display: block;
+        }
+        .video-container {
+            position: fixed;
+            bottom: 30px;
+            right: 10px;
+            width: 200px;
+            height: 150px;
+            z-index: 3;
+            border: 2px solid #FFD700;
+            cursor: pointer;
+        }
+        .video-container img {
+            width: 100%;
+            height: 100%;
+        }
+        .video-container video {
+            width: 100%;
+            height: 100%;
+            display: none;
+        }
+        .video-container img.active, .video-container video.active {
+            display: block;
+        }
+        .left-video-container {
+            position: fixed;
+            bottom: 30px;
+            left: 10px;
+            width: 200px;
+            height: 150px;
+            z-index: 3;
+            border: 2px solid #FFD700;
+            cursor: pointer;
+        }
+        .left-video-container img {
+            width: 100%;
+            height: 100%;
+        }
+        .left-video-container video {
+            width: 100%;
+            height: 100%;
+            display: none;
+        }
+        .left-video-container img.active, .left-video-container video.active {
+            display: block;
+        }
+        .left-program-container {
+            position: fixed;
+            bottom: 30px;
+            left: 10px;
+            width: 200px;
+            height: 150px;
+            z-index: 3;
+            border: 2px solid #FFD700;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: white;
+        }
+        .left-program-container img {
+            width: 100%;
+            height: 100%;
+        }
+        .left-program-container .letter {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('letter.png') no-repeat center center;
+            background-size: contain;
+        }
+        .left-program-container img.active, .left-program-container .letter.active {
+            display: block;
+        }
+        .left-program-container .button {
+            font-size: 16px;
+            color: black;
+            background-color: #FFD700;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        .top-navbar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            background-color: black;
+            height: 20px;
+            z-index: 4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .top-navbar .navbar-text {
+            color: #FFD700;
+            font-size: 12px;
+            font-family: Arial, sans-serif;
+            text-shadow: 1px 1px 2px #000000;
+        }
+        .exit-fullscreen {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 5;
+            background-color: black;
+            color: #FFD700;
+            border: 2px solid #FFD700;
+            padding: 5px 10px;
+            cursor: pointer;
+            display: none;
+        }
+        .fullscreen-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            z-index: 6;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            animation: fadeIn 1s forwards;
+        }
+        .fullscreen-container img {
+            width: 50%;
+            height: auto;
+            animation: openEnvelope 2s forwards;
+        }
+        .fullscreen-container .message {
+            font-size: 24px;
+            color: black;
+            margin-top: 20px;
+            display: none;
+            animation: showMessage 2s forwards 2s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes openEnvelope {
+            from { transform: scale(0.5); }
+            to { transform: scale(1); }
+        }
+        @keyframes showMessage {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .fade-in {
+            animation: fadeIn 1s forwards;
+        }
+        .right-bottom-text {
+            position: fixed;
+            bottom: 30px;
+            right: 10px;
+            z-index: 4;
+            background-color: black;
+            color: #FFD700;
+            font-size: 12px;
+            font-family: Arial, sans-serif;
+            text-shadow: 1px 1px 2px #000000;
+            padding: 5px 10px;
+            border: 2px solid #FFD700;
+        }
+        @keyframes enterAnimation {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .enter-animation {
+            animation: enterAnimation 1s ease-out;
+        }
+        .countdown {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: black;
+            color: #FFD700;
+            font-size: 16px;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 10px 0;
+            z-index: 5;
+        }
+        .birthday-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border: 2px solid #FFD700;
+            z-index: 10; /* 提高 z-index 以覆盖其他元素 */
+            text-align: center;
+        }
+        .birthday-popup .message {
+            font-size: 24px;
+            color: black;
+        }
+        .birthday-popup .close-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #FFD700;
+            border: none;
+            cursor: pointer;
+        }
+        .birthday-popup .music-button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #FFD700;
+            border: none;
+            cursor: pointer;
+        }
+        .half-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border: 2px solid #FFD700;
+            z-index: 8;
+            display: none;
+            text-align: center;
+            height: 50%;
+            width: 50%;
+            overflow: hidden;
+        }
+        .half-popup .message {
+            font-size: 24px;
+            color: black;
+        }
+        .half-popup .close-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #FFD700;
+            border: none;
+            cursor: pointer;
+        }
+        .half-popup-button {
+            position: fixed;
+            bottom: 50px; /* 调整位置到导航栏上方 */
+            left: 10px;
+            z-index: 9;
+        }
+        .music-play-prompt {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            color: #FFD700;
+            padding: 20px;
+            border: 2px solid #FFD700;
+            z-index: 10;
+            text-align: center;
+            display: none;
+        }
+        .music-play-prompt button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #FFD700;
+            border: none;
+            cursor: pointer;
+        }
+        .wish-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            overflow: hidden;
+            z-index: 7;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        .wish-container canvas {
+            width: 100%;
+            height: 100%;
+        }
+        .wish-input {
+            position: absolute;
+            bottom: 10px;
+            width: 80%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .star, .petal {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            box-shadow: 0 0 10px yellow;
+            animation: wishEffect 2s forwards;
+        }
+        .petal {
+            background: pink;
+            box-shadow: 0 0 10px pink;
+        }
+        @keyframes wishEffect {
+            from { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            to { transform: translate(-50%, -50%) scale(3); opacity: 0; }
+        }
+        .wish-toggle-button {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 11;
+            background-color: #FFD700;
+            color: black;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body class="fade-in enter-animation">
+    <img src="back.png" alt="Photo"> <!-- 添加照片 -->
+    <canvas id="canvas"></canvas>
+    <div class="navbar">
+        <div class="footer-text">Create by Luca-Image by 周欣怡</div> <!-- 添加文字 -->
+    </div>
+    <div class="top-navbar">
+        <div id="countdown" class="navbar-text"></div> <!-- 添加倒计时到顶部导航栏 -->
+    </div>
+    <audio id="background-music" loop>
+        <source src="music.mp3" type="audio/mpeg" onerror="console.error('music.mp3 加载失败')">
+        您的浏览器不支持音频元素。
+    </audio>
+    <div id="birthday-popup" class="birthday-popup">
+        <div class="message">生日快乐，栗子！</div>
+        <button class="music-button" onclick="playMusic(); closePopup();">播放音乐</button>
+        <button class="close-button" onclick="closePopup()">关闭</button>
+    </div>
+    <div id="half-popup" class="half-popup">
+        <div class="message">亲爱的栗子，
+
+            今天是个特别的日子，因为你今天16岁了！虽然我们是在小红书上才刚认识不久，从11月开始成为朋友，但感觉像是认识了很久一样。
+            
+            还记得我们第一次聊天时的情景吗？从分享日常到讨论我们喜欢的音乐、电影，每一次对话都充满了欢笑和共鸣。虽然你经常失踪。
+            
+            16岁，是一个充满希望和梦想的年纪。未来的日子里，希望你能勇敢追求自己的梦想，不断成长，收获更多的快乐和成功。
+            
+            在这个特别的日子里，我想对你说：谢谢你成为我的朋友。愿你的每一天都像今天一样充满爱与幸福。生日快乐，栗子！
+            
+            爱你的朋友
+            
+            （1月30日）
+            </div>
+        <button class="close-button" onclick="closeHalfPopup()">关闭</button>
+    </div>
+    <button id="half-popup-button" class="half-popup-button" onclick="showHalfPopup()">显示弹出框</button>
+    <div id="music-play-prompt" class="music-play-prompt">
+        <div>点击按钮以播放背景音乐</div>
+        <button onclick="playMusic(); hideMusicPrompt();">播放音乐</button>
+    </div>
+    <div class="wish-container" id="wish-container">
+        <canvas id="wish-canvas"></canvas>
+        <input type="text" id="wish-input" class="wish-input" placeholder="输入你的生日愿望...">
+    </div>
+    <button class="wish-toggle-button" onclick="toggleWishContainer()">进入许愿池</button>
+    <div class="music-control">
+        <button id="music-toggle" onclick="toggleMusic()">播放音乐</button> <!-- 右下角的音乐开关按钮 -->
+    </div>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        class Firework {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 5 + 5;
+                this.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                this.speedX = Math.random() * 3 - 1.5;
+                this.speedY = Math.random() * 3 - 1.5;
+                this.alpha = 1;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.size > 0.2) this.size -= 0.1;
+                if (this.alpha > 0) this.alpha -= 0.01;
+                if (this.alpha <= 0) this.reset();
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        const NUM_FIREWORKS = 100;
+        const fireworks = [];
+
+        for (let i = 0; i < NUM_FIREWORKS; i++) {
+            fireworks.push(new Firework());
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (const firework of fireworks) {
+                firework.update();
+                firework.draw();
+            }
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        const backgroundMusic = document.getElementById('background-music');
+        let isPlaying = false;
+
+        function playMusic() {
+            backgroundMusic.play().then(() => {
+                isPlaying = true;
+                document.getElementById('music-toggle').textContent = '暂停音乐';
+            }).catch(error => {
+                console.log('自动播放被阻止:', error);
+            });
+        }
+
+        function toggleMusic() {
+            if (isPlaying) {
+                backgroundMusic.pause();
+                isPlaying = false;
+                document.getElementById('music-toggle').textContent = '播放音乐';
+            } else {
+                playMusic();
+            }
+        }
+
+        function hideMusicPrompt() {
+            document.getElementById('music-play-prompt').style.display = 'none';
+        }
+
+        window.addEventListener('load', () => {
+            showPopup();
+            startCountdown();
+            drawRipple(); // 确保在页面加载时开始绘制水波纹
+        });
+
+        function showPopup() {
+            const popup = document.getElementById('birthday-popup');
+            popup.style.display = 'block';
+        }
+
+        function closePopup() {
+            const popup = document.getElementById('birthday-popup');
+            popup.style.display = 'none';
+        }
+
+        function startCountdown() {
+            const countdownElement = document.getElementById('countdown');
+            const birthday = new Date('2025-01-30T23:59:59').getTime();
+            const interval = setInterval(() => {
+                const now = new Date().getTime();
+                const diff = birthday - now;
+                if (diff <= 0) {
+                    clearInterval(interval);
+                    countdownElement.style.display = 'none';
+                    showPopup();
+                    return;
+                }
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                countdownElement.textContent = `再过 ${days} 天 ${hours} 小时 ${minutes} 分钟 ${seconds} 秒`;
+            }, 1000);
+        }
+
+        function showHalfPopup() {
+            const halfPopup = document.getElementById('half-popup');
+            halfPopup.style.display = 'block';
+        }
+
+        function closeHalfPopup() {
+            const halfPopup = document.getElementById('half-popup');
+            halfPopup.style.display = 'none';
+        }
+
+        function drawRipple() {
+            const wishCanvas = document.getElementById('wish-canvas');
+            const wishCtx = wishCanvas.getContext('2d');
+            wishCanvas.width = 300;
+            wishCanvas.height = 300;
+
+            function animateRipple() {
+                wishCtx.clearRect(0, 0, wishCanvas.width, wishCanvas.height);
+                wishCtx.beginPath();
+                wishCtx.arc(150, 150, 140, 0, Math.PI * 2);
+                wishCtx.strokeStyle = 'rgba(0, 0, 255, 0.5)';
+                wishCtx.lineWidth = 5;
+                wishCtx.stroke();
+                requestAnimationFrame(animateRipple);
+            }
+
+            animateRipple();
+        }
+
+        document.getElementById('wish-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                const wish = e.target.value;
+                if (wish) {
+                    showWishEffect();
+                    e.target.value = '';
+                }
+            }
+        });
+
+        function showWishEffect() {
+            const effect = Math.random() > 0.5 ? 'star' : 'petal';
+            const element = document.createElement('div');
+            element.className = effect;
+            element.style.top = '50%';
+            element.style.left = '50%';
+            document.body.appendChild(element);
+
+            setTimeout(() => {
+                element.style.transition = 'all 2s';
+                element.style.transform = 'translate(-50%, -50%) scale(3)';
+                element.style.opacity = '0';
+                setTimeout(() => {
+                    document.body.removeChild(element);
+                }, 2000);
+            }, 100);
+        }
+
+        function toggleWishContainer() {
+            const wishContainer = document.getElementById('wish-container');
+            if (wishContainer.style.display === 'none' || !wishContainer.style.display) {
+                wishContainer.style.display = 'flex';
+            } else {
+                wishContainer.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
